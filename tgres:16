@@ -1,0 +1,22 @@
+[0;1;32m●[0m postgresql.service - PostgreSQL database server
+     Loaded: loaded (]8;;file://Binchotan/usr/lib/systemd/system/postgresql.service\/usr/lib/systemd/system/postgresql.service]8;;\; [0;1;32menabled[0m; preset: [0;1;38:5:185mdisabled[0m)
+     Active: [0;1;32mactive (running)[0m since Sun 2026-11-15 18:29:42 EET; 2h 30min ago
+ Invocation: 398cd9bbe3f343c783a236f9da10d6b6
+    Process: 2788 ExecStartPre=/usr/libexec/postgresql-check-db-dir postgresql (code=exited, status=0/SUCCESS)
+   Main PID: 2797 (postgres)
+      Tasks: 7[0;38;5;245m (limit: 199968)[0m
+     Memory: 24.2M (peak: 24.6M)
+        CPU: 104ms
+     CGroup: /system.slice/postgresql.service
+             ├─[0;38;5;245m2797 /usr/bin/postgres -D /var/lib/pgsql/data[0m
+             ├─[0;38;5;245m2852 "postgres: logger "[0m
+             ├─[0;38;5;245m2865 "postgres: checkpointer "[0m
+             ├─[0;38;5;245m2866 "postgres: background writer "[0m
+             ├─[0;38;5;245m2875 "postgres: walwriter "[0m
+             ├─[0;38;5;245m2876 "postgres: autovacuum launcher "[0m
+             └─[0;38;5;245m2877 "postgres: logical replication launcher "[0m
+
+Nov 15 18:29:42 Binchotan systemd[1]: Starting postgresql.service - PostgreSQL database server...
+Nov 15 18:29:42 Binchotan postgres[2797]: 2026-11-15 18:29:42.613 EET [2797] LOG:  redirecting log output to logging collector process
+Nov 15 18:29:42 Binchotan postgres[2797]: 2026-11-15 18:29:42.613 EET [2797] HINT:  Future log output will appear in directory "log".
+Nov 15 18:29:42 Binchotan systemd[1]: Started postgresql.service - PostgreSQL database server.

@@ -1,0 +1,32 @@
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    # No "ports:" on purpose. The app reaches the db over the compose
+    # network as db:5432, so nothing clashes with a local Postgres.
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-dev}@db:5432/postgres
+      DISCORD_WEBHOOK: ${DISCORD_WEBHOOK:-}
+      URLS: ${URLS:-https://google.com,https://example.com,https://github.com}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
