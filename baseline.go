@@ -12,6 +12,7 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
+
 var webhook = os.Getenv("DISCORD_WEBHOOK")
 var client = &http.Client{Timeout: 5 * time.Second}
 
@@ -103,6 +104,7 @@ func main() {
 		"http://localhost:8000",
 	}
 	fails := make(map[string]int) // url -> consecutive failures
+
 	db, err := sql.Open("pgx", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
@@ -112,7 +114,29 @@ func main() {
 	if err := db.Ping(); err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS results (
+		id SERIAL PRIMARY KEY,
+		url TEXT NOT NULL,
+		status INT NOT NULL,
+		duration_ms INT NOT NULL,
+		checked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+	)`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS checks (
+		id SERIAL PRIMARY KEY,
+		url TEXT NOT NULL UNIQUE,
+		created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+	)`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	http.HandleFunc("/status", statusHandler(db))
+	http.HandleFunc("GET /checks", listChecks(db))
 	go http.ListenAndServe(":8080", nil)
 
 	ticker := time.NewTicker(10 * time.Second)
@@ -124,7 +148,6 @@ func main() {
 		var wg sync.WaitGroup
 
 		for i, url := range urls {
-
 			wg.Add(1)
 			go func(i int, u string) {
 				defer wg.Done()
@@ -134,7 +157,6 @@ func main() {
 		wg.Wait()
 
 		for _, res := range results {
-
 			if err := saveResult(db, res); err != nil {
 				fmt.Println("Failed to save result:", err)
 			}
